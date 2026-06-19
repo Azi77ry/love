@@ -1,704 +1,211 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>The Princess Samyrah</title>
-  <meta name="description" content="A luxury cinematic interactive love adventure for Samyrah." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-G5bQXrGgJvFe/2N5ZmUu4uR8sLdbVdqReNvwmP4iGkCeuXWmW4C/2OkgoeZ0HGW1" crossorigin="anonymous" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #050505;
-      --panel: rgba(6, 6, 8, 0.78);
-      --panel-strong: rgba(3, 3, 4, 0.95);
-      --text: #f8f6ff;
-      --muted: rgba(255,255,255,0.72);
-      --primary: #ff4fa3;
-      --secondary: #8a5cff;
-      --glow: rgba(255, 79, 163, 0.34);
-      --shadow: 0 0 60px rgba(255, 79, 163, 0.16);
-      font-family: 'Inter', sans-serif;
-    }
-    * { box-sizing: border-box; }
-    html, body { min-height: 100%; margin: 0; background: radial-gradient(circle at top, rgba(138,92,255,0.14), transparent 30%), radial-gradient(circle at 80% 10%, rgba(255,79,163,0.12), transparent 22%), #050505; color: var(--text); overflow-x: hidden; }
-    body { overflow-x: hidden; }
-    button, input { font: inherit; }
-    .screen { position: fixed; inset: 0; display: grid; place-items: center; z-index: 100; padding: 1.5rem; background: radial-gradient(circle farthest-side at 50% 0%, rgba(138,92,255,0.12), transparent 40%), linear-gradient(180deg, rgba(0,0,0,0.86), rgba(0,0,0,0.98)); backdrop-filter: blur(14px); transition: opacity 0.8s ease, visibility 0.8s ease; }
-    .screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .loader-card { width: min(760px,100%); padding: 2rem; border-radius: 42px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(28px); box-shadow: var(--shadow); background: rgba(7,7,9,0.58); text-align: center; position: relative; overflow: hidden; }
-    .loader-card::before { content: ''; position: absolute; inset: -15%; background: radial-gradient(circle, rgba(255,79,163,0.24), transparent 30%); filter: blur(36px); pointer-events: none; }
-    .loader-card h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.8rem, 4vw, 4.5rem); margin: 0; letter-spacing: 0.06em; text-transform: uppercase; }
-    .loader-card p { margin: 1rem auto 1.75rem; max-width: 26rem; color: #d6d0e4; font-size: 1.05rem; line-height: 1.9; }
-    .progress-ring { width: 200px; height: 200px; margin: 0 auto 1rem; position: relative; }
-    .progress-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    .progress-ring circle { fill: none; stroke-width: 18; stroke-linecap: round; stroke: rgba(255,255,255,0.12); }
-    .progress-ring circle.progress { stroke: var(--primary); stroke-dasharray: 630; stroke-dashoffset: 630; transition: stroke-dashoffset 0.2s ease; filter: drop-shadow(0 0 22px rgba(255,79,163,0.45)); }
-    .progress-ring .percent { position: absolute; inset: 0; display: grid; place-items: center; font-size: 2.6rem; font-weight: 800; }
-    .aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(circle at 30% 10%, rgba(138,92,255,0.18), transparent 22%), radial-gradient(circle at 80% 15%, rgba(255,79,163,0.14), transparent 24%), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04), transparent 22%); mix-blend-mode: screen; filter: blur(14px); }
-    .particle-layer { position: fixed; inset: 0; z-index: 10; pointer-events: none; overflow: hidden; }
-    .particle, .petal { position: absolute; border-radius: 50%; opacity: 0.95; pointer-events: none; }
-    .cursor { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.9); pointer-events: none; transform: translate(-50%, -50%); mix-blend-mode: difference; z-index: 120; transition: transform 0.15s ease; }
-    .hud { position: fixed; inset: auto 1.25rem 0 1.25rem; display: flex; justify-content: space-between; gap: 1rem; z-index: 60; pointer-events: none; }
-    .hud > * { pointer-events: auto; }
-    .hud-panel { display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.9rem 1rem; border-radius: 999px; background: rgba(7,7,9,0.78); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(24px); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
-    .hud-panel span, .hud-button { color: var(--text); font-size: 0.95rem; }
-    .hud-button { display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.72rem 1rem; border-radius: 999px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.07); cursor: pointer; transition: background 0.3s ease; }
-    .hud-button:hover { background: rgba(255,79,163,0.16); }
-    main { position: relative; z-index: 2; }
-    .section { min-height: 100vh; padding: clamp(4rem, 6vw, 6rem) 1.5rem 4rem; display: grid; align-items: center; overflow: hidden; }
-    .section-grid { display: grid; gap: 2rem; max-width: 1400px; margin: 0 auto; align-items: center; }
-    .intro-copy { max-width: 720px; }
-    .small-glow { color: rgba(255,255,255,0.72); font-size: 0.95rem; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 1rem; }
-    .hero-button, .final-button { border-radius: 999px; padding: 1.15rem 2.25rem; border: 1px solid rgba(255,255,255,0.15); background: linear-gradient(135deg, rgba(255,79,163,0.32), rgba(138,92,255,0.22)); color: #fff; font-weight: 700; letter-spacing: 0.08em; cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease; }
-    .hero-button:hover, .final-button:hover { transform: translateY(-3px); box-shadow: 0 20px 60px rgba(255,79,163,0.22); }
-    h2, h3, h4, h5 { font-family: 'Playfair Display', serif; color: #fff; margin: 0; }
-    h2 { font-size: clamp(3rem, 5vw, 4.6rem); line-height: 0.98; letter-spacing: -0.04em; text-transform: uppercase; }
-    .chapter-title { font-size: clamp(3rem, 5vw, 4rem); letter-spacing: 0.05em; }
-    p { color: rgba(255,255,255,0.84); line-height: 1.8; }
-    .glass-panel { position: relative; border-radius: 36px; border: 1px solid rgba(255,255,255,0.08); background: rgba(10,10,12,0.64); backdrop-filter: blur(32px); box-shadow: 0 30px 80px rgba(0,0,0,0.28); padding: 2rem; overflow: hidden; }
-    .glass-panel::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at top left, rgba(138,92,255,0.12), transparent 30%); pointer-events: none; }
-    .stat-grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0,1fr)); margin-top: 1.5rem; }
-    .stat { position: relative; padding: 1.35rem 1.25rem; border-radius: 28px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); overflow: hidden; }
-    .stat::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,79,163,0.14), transparent 52%); opacity: 0.9; pointer-events: none; }
-    .stat strong { position: relative; display: block; font-size: 1.6rem; margin-bottom: 0.55rem; }
-    .stat span { position: relative; color: rgba(255,255,255,0.84); font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; }
-    .chapter-actions, .badge-panel, .options { display: grid; gap: 1rem; }
-    .badge-panel { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 1.5rem; }
-    .badge { display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.95rem 1rem; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); text-transform: uppercase; letter-spacing: 0.06em; }
-    .badge span { width: 1.6rem; height: 1.6rem; display: grid; place-items: center; border-radius: 50%; background: rgba(255,79,163,0.18); }
-    .hint-card { border-radius: 28px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); padding: 1.8rem; box-shadow: inset 0 0 45px rgba(138,92,255,0.12); }
-    .game-stage { position: relative; min-height: 420px; border-radius: 36px; background: rgba(10,10,12,0.65); border: 1px solid rgba(255,255,255,0.08); overflow: hidden; padding: 1rem; display: grid; place-items: center; }
-    .heart-note { position: absolute; bottom: 1.2rem; left: 1.2rem; right: 1.2rem; padding: 1rem 1.2rem; border-radius: 24px; background: rgba(4,4,5,0.86); border: 1px solid rgba(255,255,255,0.08); font-size: 0.98rem; line-height: 1.6; }
-    .heart-collector { position: absolute; inset: 0; pointer-events: none; }
-    .heart-object { position: absolute; width: clamp(64px, 8vw, 120px); aspect-ratio: 1; cursor: pointer; pointer-events: auto; display: grid; place-items: center; transform: translate3d(0,0,0); will-change: transform, opacity; }
-    .heart-shape { width: 100%; height: 100%; background: radial-gradient(circle at 30% 30%, #ff8ac9, #ff4fa3 35%, #ad4484 65%); clip-path: polygon(50% 0%, 84% 18%, 100% 50%, 75% 100%, 50% 82%, 25% 100%, 0% 50%, 16% 18%); box-shadow: 0 20px 60px rgba(255,79,163,0.18); }
-    .timeline-grid, .museum-grid, .future-grid, .options { display: grid; gap: 1.25rem; }
-    .timeline-item, .museum-card, .future-card, .option-button, .door-portal { padding: 1.5rem; border-radius: 32px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); box-shadow: 0 20px 60px rgba(0,0,0,0.18); transition: transform 0.3s ease, background 0.3s ease; cursor: pointer; }
-    .timeline-item:hover, .museum-card:hover, .future-card:hover, .option-button:hover { transform: translateY(-6px); background: rgba(255,255,255,0.08); }
-    .timeline-item h4 { font-size: 1.4rem; margin-bottom: 0.7rem; }
-    .timeline-item p, .museum-card p, .future-card p, .option-button { color: rgba(255,255,255,0.82); }
-    .museum-card { text-align: center; min-height: 180px; }
-    .museum-card h5, .future-card h5 { margin-bottom: 0.85rem; }
-    .constellation { min-height: 560px; position: relative; border-radius: 42px; border: 1px solid rgba(255,255,255,0.12); background: radial-gradient(circle at 40% 10%, rgba(138,92,255,0.12), transparent 26%), linear-gradient(135deg, rgba(255,79,163,0.08), rgba(255,255,255,0.02)); overflow: hidden; }
-    .starfield { position: absolute; inset: 0; pointer-events: none; }
-    .star { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.88); box-shadow: 0 0 18px rgba(255,255,255,0.3); cursor: pointer; transition: transform 0.2s ease, opacity 0.24s ease; }
-    .star:hover { transform: scale(1.25); }
-    .star-message { position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem; padding: 1.2rem 1.3rem; border-radius: 28px; background: rgba(8,8,10,0.88); border: 1px solid rgba(255,255,255,0.08); color: #f4ecff; min-height: 4.5rem; }
-    .heartbeat-stage { display: grid; place-items: center; min-height: 520px; gap: 2rem; }
-    .heartbeat-card { width: 240px; aspect-ratio: 1; border-radius: 50%; border: 3px solid rgba(255,79,163,0.45); display: grid; place-items: center; position: relative; background: radial-gradient(circle at 30% 30%, rgba(255,79,163,0.24), transparent 52%), rgba(0,0,0,0.18); box-shadow: 0 0 70px rgba(255,79,163,0.12); cursor: pointer; }
-    .heartbeat-card::after { content: ''; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 40px rgba(255,79,163,0.25); }
-    .heartbeat-icon { width: 72px; height: 72px; background: radial-gradient(circle at 30% 30%, #ffe1ef, #ff4fa3 48%, #a1276b 86%); clip-path: polygon(50% 12%, 85% 34%, 78% 75%, 50% 96%, 22% 75%, 15% 34%); box-shadow: 0 0 45px rgba(255,79,163,0.35); animation: pulse 1.5s ease-in-out infinite; }
-    @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.92; } 50% { transform: scale(1.06); opacity: 1; } }
-    .door-wrapper { display: grid; gap: 1.5rem; justify-items: center; }
-    .door-portal { width: min(420px,100%); min-height: 520px; border-radius: 38px; border: 1px solid rgba(255,255,255,0.12); background: radial-gradient(circle at 40% 20%, rgba(138,92,255,0.16), transparent 30%), rgba(5,5,5,0.8); display: grid; place-items: center; position: relative; overflow: hidden; }
-    .door-portal::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.02) 46%, transparent 100%); pointer-events: none; }
-    .door-input { width: 100%; max-width: 360px; padding: 1.2rem 1.3rem; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.04); color: #fff; outline: none; }
-    .door-hint { color: rgba(255,255,255,0.66); font-size: 0.95rem; text-align: center; }
-    .quiz-card { padding: 2rem; border-radius: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
-    .option-button { text-align: left; }
-    .final-screen { min-height: 100vh; display: grid; place-items: center; padding: 5rem 1.5rem 3rem; }
-    .final-panel { max-width: 860px; padding: 3rem 2rem; border-radius: 48px; border: 1px solid rgba(255,255,255,0.12); background: rgba(4,4,4,0.78); backdrop-filter: blur(24px); box-shadow: 0 40px 90px rgba(0,0,0,0.38); position: relative; overflow: hidden; }
-    .footer { margin-top: 1.5rem; color: rgba(255,255,255,0.62); font-size: 0.95rem; }
-    .hidden { display: none !important; }
-    @media (max-width: 900px) { .section-grid { grid-template-columns: 1fr; } .hud { flex-direction: column; align-items: stretch; } .hud-panel { justify-content: space-between; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>The Samyrah Experience ❤️ — From Aziry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600&family=Poppins:wght@300;400;500;600&family=Tangerine:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="screen" id="loader">
-    <div class="loader-card">
-      <div class="progress-ring">
-        <svg aria-hidden="true" viewBox="0 0 220 220">
-          <circle cx="110" cy="110" r="100"></circle>
-          <circle class="progress" cx="110" cy="110" r="100"></circle>
-        </svg>
-        <div class="percent" id="loaderPercent">0%</div>
-      </div>
-      <h1>Preparing something special for Samyrah...</h1>
-      <p>Entering a handcrafted cinematic world where love, magic, and emotion are woven into every scene.</p>
+<body class="intro-active">
+
+<!-- ====================== AURORA BACKGROUND ====================== -->
+<div class="aurora-bg" aria-hidden="true">
+  <div class="aurora-blob b1"></div>
+  <div class="aurora-blob b2"></div>
+  <div class="aurora-blob b3"></div>
+  <div class="aurora-blob b4"></div>
+  <div class="grain"></div>
+</div>
+
+<!-- ====================== CURSOR EFFECTS ====================== -->
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+<!-- ====================== AUDIO CONTROL ====================== -->
+<div class="audio-control" id="audioControl">
+  <button id="audioToggle" class="audio-btn" aria-label="Play ambient music">
+    <svg id="iconPlay" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+    <svg id="iconPause" viewBox="0 0 24 24" width="18" height="18" style="display:none"><path fill="currentColor" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+  <canvas id="visualizer" width="60" height="22"></canvas>
+  <input type="range" id="volumeSlider" min="0" max="100" value="35" aria-label="Volume">
+</div>
+
+<!-- ====================== CINEMATIC INTRO ====================== -->
+<section class="intro" id="intro">
+  <canvas id="introCanvas"></canvas>
+  <div class="intro-text" id="introText">
+    <p class="whisper" id="whisperLine">Every heartbeat of mine whispers your name&hellip;</p>
+    <h1 class="i-love-you-line" id="loveLine">I LOVE YOU <span class="name-script">SAMYRAH</span> <span class="heart-emoji">❤️</span></h1>
+  </div>
+  <button class="skip-intro" id="skipIntro">Skip intro ↦</button>
+</section>
+
+<!-- ====================== MAIN EXPERIENCE ====================== -->
+<main id="main" class="main hidden">
+
+  <!-- HERO MESSAGE -->
+  <section class="section hero-message" id="heroMessage">
+    <div class="glass-card hero-card" data-reveal>
+      <p class="eyebrow">To My Beautiful</p>
+      <h2 class="display-title">Samyrah <span class="heart-emoji small">❤️</span></h2>
+      <p class="typewriter" id="heroTypewriter"></p>
     </div>
+    <div class="scroll-cue" aria-hidden="true"><span></span>scroll the love story</div>
+  </section>
+
+  <!-- INTERACTIVE LOVE GARDEN -->
+  <section class="section love-garden" id="loveGarden">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">touch anywhere</p>
+      <h2 class="display-title">The Love Garden</h2>
+      <p class="lede">Tap, click, or swipe across this field — every touch grows something beautiful.</p>
+    </div>
+    <div class="garden-field" id="gardenField"></div>
+  </section>
+
+  <!-- LOVE TIMELINE -->
+  <section class="section timeline-section" id="timelineSection">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">our story so far</p>
+      <h2 class="display-title">The Love Timeline</h2>
+    </div>
+    <div class="timeline" id="timeline">
+      <div class="timeline-line" aria-hidden="true"></div>
+
+      <article class="timeline-card" data-side="left">
+        <div class="timeline-dot"></div>
+        <div class="glass-card">
+          <span class="timeline-icon">❤️</span>
+          <h3>The Day We Met</h3>
+          <p>The moment our worlds quietly collided — and nothing has been the same since.</p>
+        </div>
+      </article>
+
+      <article class="timeline-card" data-side="right">
+        <div class="timeline-dot"></div>
+        <div class="glass-card">
+          <span class="timeline-icon">💌</span>
+          <h3>The First Message</h3>
+          <p>A few simple words that somehow found their way straight to my heart.</p>
+        </div>
+      </article>
+
+      <article class="timeline-card" data-side="left">
+        <div class="timeline-dot"></div>
+        <div class="glass-card">
+          <span class="timeline-icon">😊</span>
+          <h3>The First Smile</h3>
+          <p>The first time I made you smile, I knew I wanted to keep doing it forever.</p>
+        </div>
+      </article>
+
+      <article class="timeline-card" data-side="right">
+        <div class="timeline-dot"></div>
+        <div class="glass-card">
+          <span class="timeline-icon">❤️</span>
+          <h3>Today</h3>
+          <p>Right now, in this very moment, loving you still feels like the easiest thing in the world.</p>
+        </div>
+      </article>
+
+      <article class="timeline-card" data-side="left">
+        <div class="timeline-dot"></div>
+        <div class="glass-card">
+          <span class="timeline-icon">♾️</span>
+          <h3>Forever</h3>
+          <p>Wherever life takes us, this is the one chapter that never ends.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- LOVE COUNTER -->
+  <section class="section counter-section" id="counterSection">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">trying to keep count</p>
+      <h2 class="display-title">Reasons I Love Samyrah</h2>
+    </div>
+    <div class="counter-display" data-reveal>
+      <span class="counter-number" id="counterNumber">0</span>
+      <p class="counter-result" id="counterResult"></p>
+    </div>
+  </section>
+
+  <!-- LOVE LETTER -->
+  <section class="section letter-section" id="letterSection">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">sealed with love</p>
+      <h2 class="display-title">A Letter, Just for You</h2>
+      <p class="lede">Open it whenever you're ready.</p>
+    </div>
+
+    <div class="envelope-wrap" data-reveal>
+      <div class="envelope" id="envelope" tabindex="0" role="button" aria-expanded="false" aria-label="Open the love letter">
+        <div class="envelope-back"></div>
+        <div class="letter-paper" id="letterPaper">
+          <p class="letter-greeting">To My Beautiful Samyrah ❤️</p>
+          <p class="letter-body" id="letterBody"></p>
+          <p class="letter-sign">Forever Yours,<br><span class="name-script small">Aziry</span> ❤️</p>
+        </div>
+        <div class="envelope-front">
+          <div class="envelope-flap"></div>
+          <div class="envelope-seal">❤️</div>
+        </div>
+      </div>
+      <p class="envelope-hint">tap the envelope to open</p>
+    </div>
+  </section>
+
+  <!-- SURPRISE BUTTON -->
+  <section class="section surprise-section" id="surpriseSection">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">one more thing</p>
+      <h2 class="display-title">A Little Surprise</h2>
+    </div>
+    <button class="surprise-btn" id="surpriseBtn" data-reveal>
+      <span>PRESS ME</span> <span class="heart-emoji">❤️</span>
+    </button>
+  </section>
+
+  <!-- STARRY NIGHT FINALE -->
+  <section class="section finale-section" id="finaleSection">
+    <canvas id="starCanvas"></canvas>
+    <div class="finale-content">
+      <p class="finale-pretext" data-reveal>and as the night falls, the stars already know&hellip;</p>
+      <div class="finale-heart-wrap" data-reveal>
+        <svg viewBox="0 0 100 90" class="finale-heart">
+          <defs>
+            <linearGradient id="finaleHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff4d8d"/>
+              <stop offset="35%" stop-color="#ff86a8"/>
+              <stop offset="65%" stop-color="#ffd28a"/>
+              <stop offset="100%" stop-color="#c490e4"/>
+            </linearGradient>
+          </defs>
+          <path d="M50 85 C 20 65, -5 40, 12 18 C 24 2, 45 4, 50 22 C 55 4, 76 2, 88 18 C 105 40, 80 65, 50 85 Z" fill="url(#finaleHeartGrad)"/>
+        </svg>
+      </div>
+      <p class="finale-forever" data-reveal>Today. Tomorrow. Forever.</p>
+      <p class="finale-credit" data-reveal>Aziry <span class="heart-emoji small">❤️</span> Samyrah</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ====================== SURPRISE OVERLAY ====================== -->
+<div class="surprise-overlay" id="surpriseOverlay">
+  <canvas id="fireworksCanvas"></canvas>
+  <div class="surprise-message">
+    <p>Samyrah,<br>you are the most beautiful part of my life.</p>
+    <button id="closeSurprise" class="close-x">close</button>
   </div>
+</div>
 
-  <div class="aurora"></div>
-  <div class="particle-layer" id="particleLayer"></div>
-  <div class="cursor" id="magicCursor"></div>
-
-  <div class="hud">
-    <div class="hud-panel"><span id="progressText">Progress: Chapter 1</span></div>
-    <button class="hud-button" id="musicToggle">Music: ON</button>
-  </div>
-
-  <main>
-    <section class="section" id="chapter1">
-      <div class="section-grid">
-        <div class="intro-copy" data-aos="fade-up">
-          <div class="small-glow">Chapter 1 · The Beginning</div>
-          <h2>There are billions of people in the world...</h2>
-          <p>And somehow, my favorite person became Samyrah. This world is built for you, with cinematic motion, cosmic light, and a story that unfolds like a dream.</p>
-          <button class="hero-button" id="enterWorld">ENTER MY WORLD ❤️</button>
-        </div>
-        <div class="glass-panel" data-aos="fade-left">
-          <h3>Samyrah</h3>
-          <p>Every glow, every heartbeat, every chapter is designed to feel like a luxury digital universe built just for you.</p>
-          <div class="badge-panel">
-            <div class="badge"><span>★</span> Cinematic</div>
-            <div class="badge"><span>♥</span> Emotional</div>
-            <div class="badge"><span>∞</span> Interactive</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter2">
-      <div class="section-grid">
-        <div class="glass-panel" data-aos="fade-right">
-          <div class="chapter-title">Classified File</div>
-          <p>TOP SECRET • SUBJECT: SAMYRAH • STATUS: DANGEROUSLY BEAUTIFUL</p>
-          <div class="stat-grid">
-            <div class="stat"><strong>HEART THEFT</strong><span>100%</span></div>
-            <div class="stat"><strong>RISK LEVEL</strong><span>EXTREME</span></div>
-            <div class="stat"><strong>REASON</strong><span>Successfully stole Aziry's heart</span></div>
-            <div class="stat"><strong>ACCESS</strong><span><span id="scanStatus">LOCKED</span></span></div>
-          </div>
-          <div class="chapter-actions">
-            <button class="hero-button" id="scanButton">INITIATE FINGERPRINT SCAN</button>
-            <button class="hero-button" id="openAccess" disabled>ACCESS GRANTED</button>
-          </div>
-        </div>
-        <div class="glass-panel" data-aos="fade-up">
-          <div id="scannerDisplay" style="min-height:320px; display:grid; place-items:center; color:#fff; font-weight:500; font-size:1.05rem; line-height:1.7; text-align:center;">
-            Place your finger on the glass and unlock the secret.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter3">
-      <div class="section-grid">
-        <div data-aos="fade-up">
-          <div class="chapter-title">Heart Hunt Game</div>
-          <p>Collect floating hearts across the sky and discover messages that remind you why you are unforgettable.</p>
-          <div class="hint-card"><h4>Objective</h4><p>Collect 15 hearts. Each heart reveals a secret message and builds a progress score.</p></div>
-        </div>
-        <div class="glass-panel game-stage" data-aos="zoom-in">
-          <div class="heart-note" id="heartNote">Collect the floating hearts and feel the story bloom.</div>
-          <div class="heart-collector" id="heartCollector"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter4">
-      <div class="section-grid">
-        <div class="glass-panel" data-aos="fade-right">
-          <div class="chapter-title">Memory Timeline</div>
-          <p>A story told in moments — the day we met, the laughter, the smiles, the unforgettable feelings. Each memory glows as a milestone in our journey.</p>
-          <div class="timeline-grid" id="timelineGrid"></div>
-        </div>
-        <div class="glass-panel" data-aos="fade-left">
-          <h3>Milestones</h3>
-          <p>Every card is a small cinematic scene with a message that makes time feel magical.</p>
-          <div class="badge-panel">
-            <div class="badge"><span>☽</span> The Day We Met</div>
-            <div class="badge"><span>☼</span> Favorite Moment</div>
-            <div class="badge"><span>❤</span> Future Together</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter5">
-      <div class="section-grid">
-        <div class="glass-panel" data-aos="fade-right">
-          <div class="chapter-title">The Samyrah Museum</div>
-          <p>Luxury gallery of qualities that make you radiant. Tap each frame to reveal why that part of you is treasured.</p>
-          <div class="museum-grid" id="museumGrid"></div>
-        </div>
-        <div class="glass-panel" data-aos="fade-left">
-          <h3>Categories</h3>
-          <p>Her Smile, Her Voice, Her Energy, Her Kindness — every frame shows a reason why you are loved.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter6">
-      <div class="section-grid">
-        <div class="glass-panel" data-aos="fade-right">
-          <div class="chapter-title">The Constellation of Memories</div>
-          <p>Click glowing stars to reveal secret messages. Each star is a hidden note in the night sky.</p>
-        </div>
-        <div class="constellation" data-aos="fade-up">
-          <div class="starfield" id="starfield"></div>
-          <div class="star-message" id="starMessage">Click a star to uncover a message.</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter7">
-      <div class="section-grid">
-        <div class="heartbeat-stage" data-aos="fade-up">
-          <div class="chapter-title">Heartbeat Connection</div>
-          <p>Keep the heartbeat alive. Tap the heart to make the rhythm stronger and unlock an emotional moment.</p>
-          <div class="heartbeat-card" id="heartbeatCard" aria-label="Heartbeat interaction"><div class="heartbeat-icon"></div></div>
-          <div class="hint-card" id="heartbeatHint">Tap the heart and watch it grow brighter.</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter8">
-      <div class="section-grid">
-        <div data-aos="fade-right">
-          <div class="chapter-title">The Future Room</div>
-          <p>Floating dreams in a futuristic chamber. Open each holographic card and feel the future sparkle.</p>
-          <div class="future-grid" id="futureGrid"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter9">
-      <div class="section-grid">
-        <div class="glass-panel" data-aos="fade-up">
-          <div class="chapter-title">Message Rain</div>
-          <p>Words fall like glowing petals. Touch them to trigger playful effects and brighten the sky.</p>
-          <div class="rain-stage"><div class="rain-words" id="rainWords"></div></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter10">
-      <div class="section-grid">
-        <div class="glass-panel" data-aos="fade-right">
-          <div class="chapter-title">The Impossible Button</div>
-          <p>One button runs away, the other invites you to continue. Play with the moment and enjoy the magic.</p>
-          <div class="chapter-actions">
-            <button class="hud-button" id="leaveButton">LEAVE</button>
-            <button class="hud-button" id="continueButton">CONTINUE</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter11">
-      <div class="section-grid">
-        <div class="quiz-card" data-aos="fade-up">
-          <div class="chapter-title">How Well Do You Know Aziry?</div>
-          <p>Answer the question and unlock a confetti celebration when you choose the heart answer.</p>
-          <h4>What makes Aziry happiest?</h4>
-          <div class="options">
-            <button class="option-button" data-answer="false">A) Food</button>
-            <button class="option-button" data-answer="false">B) Sleep</button>
-            <button class="option-button" data-answer="true">C) Messages from Samyrah</button>
-          </div>
-          <p class="hint-card" id="quizResult">Choose your answer.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="chapter12">
-      <div class="section-grid">
-        <div class="glass-panel" data-aos="fade-right">
-          <div class="chapter-title">The Secret Door</div>
-          <p>Enter the password to open the cinematic doorway. Hint: The name of the girl who stole my heart.</p>
-          <div class="door-wrapper">
-            <div class="door-portal" id="doorPortal">
-              <input class="door-input" id="doorInput" placeholder="Type the password" autocomplete="off" />
-            </div>
-            <div class="door-hint">Correct answer: SAMYRAH</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="finalChapter">
-      <div class="final-screen" data-aos="fade-up">
-        <div class="final-panel">
-          <h2>Before I met you...</h2>
-          <p id="finalNarration">A story of a stranger becoming the most precious part of my world.</p>
-          <div class="badge-panel" style="justify-content:center; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
-            <div class="badge"><span>★</span> Grateful</div>
-            <div class="badge"><span>❤</span> Irreplaceable</div>
-          </div>
-          <button class="final-button" id="showFinal">SEARCH THE UNIVERSE...</button>
-          <p class="footer">Created with love by Aziry for Samyrah.</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" integrity="sha512-aD4Dnl2OLnaH9wE3Opmk+G4NiD7KqSJ9VAl3o7UTg9qOaZtdCNlr9FTxSEtKk6ZTMvrznRlV/NEdzoIcyE5lHw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" integrity="sha512-_UF2v4tXlw96XyqR63xMk/8N52BJGI+K8LDRKq9gAnJ/5Ck5J2WU+T4KT7+gYG+h9wrZNVbEuTAHkPhi1Khm7g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.3/vanilla-tilt.min.js" integrity="sha512-RYsFQ4H5jpJ4K3iVY6zx2xeu8QTx6iH6c0o53WbWsj8RImUGY6hS9bP94cxHI70tOCpb3efXV+9RkEJ6GkM9Ng==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-A7AYkI2p5i0Z1Q1cvS7RlB/nAy1QdVnytrh/UY7VHpzkpOb2nLYV/Y5c+85g1UARGU6jL761sHN/uJjI1p2dHw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script>
-    const state = { chapter: 1, heartsCollected: 0, achievements: new Set(['WELCOME']), heartbeatLevel: 0, musicOn: true, doorOpened: false };
-
-    const messages = [
-      'You make ordinary days special.',
-      'You have a beautiful smile.',
-      'You became my favorite notification.',
-      'You are unforgettable.',
-      'You make life brighter.',
-      'Your voice feels like comfort.',
-      'Your laughter is a melody.',
-      'Your presence feels like home.',
-      'You turn small moments into magic.',
-      'You are one of the best parts of my day.',
-      'Meeting you changed something in me.',
-      'I smile when I see your messages.',
-      'Your kindness inspires me.',
-      'You are softly brave.',
-      'You are beautifully unforgettable.'
-    ];
-
-    const starMessages = [
-      'Meeting you changed something in me.',
-      'You became my favorite notification.',
-      'I smile when I see your messages.',
-      'You are one of the best parts of my day.',
-      'Your kindness creates light.',
-      'Your presence is precious.',
-      'You make the universe feel close.',
-      'You are my favorite story.',
-      'Your laugh is my favorite sound.',
-      'You are the beloved highlight of today.'
-    ];
-
-    const museumItems = [
-      { title: 'Her Smile', text: 'Because your smile brightens every dark corner and makes everything feel warm.' },
-      { title: 'Her Personality', text: 'Because your energy is bold, gentle, and beautifully unforgettable.' },
-      { title: 'Her Voice', text: 'Because your voice feels like comfort, like home, like a secret I always want to hear.' },
-      { title: 'Her Kindness', text: 'Because your heart is generous, thoughtful, and always giving light to others.' },
-      { title: 'Her Energy', text: 'Because your spark makes every moment feel energized and possible.' },
-      { title: 'Her Presence', text: 'Because simply being near you turns ordinary time into something magical.' }
-    ];
-
-    const timelineItems = [
-      { title: 'The Day We Met', text: 'A moment that changed the sky and turned two paths into one.' },
-      { title: 'First Great Conversation', text: 'Where time slipped away and the world felt brighter through words.' },
-      { title: 'Favorite Moment', text: 'A memory that feels like a private movie just for us.' },
-      { title: 'Funniest Chat', text: 'Laughter that echoed in a room we created together.' },
-      { title: 'Today', text: 'A present filled with awe, beauty, and gentle certainty.' },
-      { title: 'Future', text: 'A promise of many more stars, stories, and quiet smiles.' }
-    ];
-
-    const futureDreams = [
-      { title: 'Travel Together', text: 'Discover new cities, sunsets, and hidden places hand in hand.' },
-      { title: 'Watch Sunsets', text: 'Collect soft moments as the sky changes color with you.' },
-      { title: 'Create Memories', text: 'Turn ordinary days into unforgettable chapters of us.' },
-      { title: 'Support Each Other', text: 'Build a caring space where we grow and thrive together.' },
-      { title: 'Grow Together', text: 'Evolve side by side, learning and dreaming with trust.' },
-      { title: 'Build Something Beautiful', text: 'Make a world that feels luxurious, kind, and inspired by love.' }
-    ];
-
-    const wordRain = ['Beautiful', 'Amazing', 'Special', 'Cute', 'Kind', 'Wonderful', 'Lovely', 'Radiant', 'Precious', 'Dreamy'];
-
-    const progressText = document.getElementById('progressText');
-    const musicToggle = document.getElementById('musicToggle');
-    const loader = document.getElementById('loader');
-    const loaderPercent = document.getElementById('loaderPercent');
-    const progressCircle = document.querySelector('.progress-ring circle.progress');
-    const enterWorld = document.getElementById('enterWorld');
-    const scanButton = document.getElementById('scanButton');
-    const openAccess = document.getElementById('openAccess');
-    const scanStatus = document.getElementById('scanStatus');
-    const scannerDisplay = document.getElementById('scannerDisplay');
-    const heartCollector = document.getElementById('heartCollector');
-    const heartNote = document.getElementById('heartNote');
-    const timelineGrid = document.getElementById('timelineGrid');
-    const museumGrid = document.getElementById('museumGrid');
-    const starfield = document.getElementById('starfield');
-    const starMessage = document.getElementById('starMessage');
-    const heartbeatCard = document.getElementById('heartbeatCard');
-    const heartbeatHint = document.getElementById('heartbeatHint');
-    const futureGrid = document.getElementById('futureGrid');
-    const rainWords = document.getElementById('rainWords');
-    const leaveButton = document.getElementById('leaveButton');
-    const continueButton = document.getElementById('continueButton');
-    const quizResult = document.getElementById('quizResult');
-    const doorInput = document.getElementById('doorInput');
-    const doorPortal = document.getElementById('doorPortal');
-    const showFinal = document.getElementById('showFinal');
-    const finalNarration = document.getElementById('finalNarration');
-
-    function updateProgress(chapter) {
-      progressText.textContent = `Progress: Chapter ${chapter}`;
-    }
-
-    function animateLoader() {
-      let percent = 0;
-      const timer = setInterval(() => {
-        percent += Math.floor(Math.random() * 6) + 4;
-        if (percent >= 100) percent = 100;
-        loaderPercent.textContent = `${percent}%`;
-        progressCircle.style.strokeDashoffset = 630 - (630 * percent) / 100;
-        if (percent === 100) { clearInterval(timer); setTimeout(() => loader.classList.add('hidden'), 900); }
-      }, 120);
-    }
-
-    function enterChapter(sectionId) {
-      const target = document.getElementById(`chapter${sectionId}`) || document.getElementById(sectionId);
-      if (!target) return;
-      target.scrollIntoView({ behavior: 'smooth' });
-      updateProgress(sectionId);
-      setTimeout(() => AOS.refreshHard(), 500);
-    }
-
-    enterWorld.addEventListener('click', () => enterChapter(2));
-
-    scanButton.addEventListener('click', () => {
-      scanStatus.textContent = 'SCANNING...';
-      scannerDisplay.textContent = 'Analyzing gorgeous energy...';
-      scanButton.disabled = true;
-      setTimeout(() => {
-        scanStatus.textContent = 'ACCESS GRANTED';
-        scannerDisplay.textContent = 'ACCESS GRANTED • Achievement unlocked: Heart Guardian';
-        openAccess.disabled = false;
-      }, 2600);
-    });
-
-    openAccess.addEventListener('click', () => enterChapter(3));
-
-    function createHeart(index) {
-      const heart = document.createElement('button');
-      heart.className = 'heart-object';
-      heart.style.left = `${Math.random() * 78 + 10}%`;
-      heart.style.top = `${Math.random() * 72 + 8}%`;
-      heart.innerHTML = '<span class="heart-shape"></span>';
-      heart.addEventListener('click', () => {
-        if (heart.dataset.collected === 'true') return;
-        heart.dataset.collected = 'true';
-        heart.style.transform = 'scale(0)';
-        heart.style.opacity = '0';
-        state.heartsCollected += 1;
-        heartNote.textContent = messages[(state.heartsCollected - 1) % messages.length];
-        if (state.heartsCollected === 15) setTimeout(() => enterChapter(4), 1600);
-      });
-      heartCollector.appendChild(heart);
-    }
-
-    function createHeartGame() { heartCollector.innerHTML = ''; for (let i = 0; i < 15; i += 1) createHeart(i); }
-
-    function setUpTimeline() {
-      timelineGrid.innerHTML = '';
-      timelineItems.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'timeline-item';
-        card.innerHTML = `<h4>${item.title}</h4><p>${item.text}</p>`;
-        card.addEventListener('click', () => playSound('tiny'));
-        timelineGrid.appendChild(card);
-        VanillaTilt.init(card, { max: 12, speed: 400, glare: true, 'max-glare': 0.2 });
-      });
-    }
-
-    function setUpMuseum() {
-      museumGrid.innerHTML = '';
-      museumItems.forEach(item => {
-        const card = document.createElement('button');
-        card.className = 'museum-card';
-        card.innerHTML = `<h5>${item.title}</h5><p>${item.text}</p>`;
-        card.addEventListener('click', () => { playSound('soft'); card.style.borderColor = '#ff4fa3'; });
-        museumGrid.appendChild(card);
-      });
-    }
-
-    function setUpStars() {
-      starfield.innerHTML = '';
-      for (let i = 0; i < 50; i += 1) {
-        const star = document.createElement('button');
-        star.className = 'star';
-        star.style.left = `${Math.random() * 88 + 4}%`;
-        star.style.top = `${Math.random() * 84 + 6}%`;
-        star.style.width = `${Math.random() * 12 + 10}px`;
-        star.style.height = star.style.width;
-        star.addEventListener('click', () => {
-          starMessage.textContent = starMessages[Math.floor(Math.random() * starMessages.length)];
-          playSound('twinkle');
-        });
-        starfield.appendChild(star);
-      }
-    }
-
-    heartbeatCard.addEventListener('click', () => {
-      state.heartbeatLevel += 1;
-      heartbeatCard.style.transform = `scale(${Math.min(1 + state.heartbeatLevel * 0.05, 1.45)})`;
-      heartbeatHint.textContent = state.heartbeatLevel > 4 ? 'You kept my heart beating. It feels stronger.' : 'Keep tapping to strengthen the heartbeat.';
-      playSound('pulse');
-      if (state.heartbeatLevel === 7) setTimeout(() => enterChapter(8), 900);
-    });
-
-    function setUpFuture() {
-      futureGrid.innerHTML = '';
-      futureDreams.forEach(item => {
-        const card = document.createElement('button');
-        card.className = 'future-card';
-        card.innerHTML = `<h5>${item.title}</h5><p>${item.text}</p>`;
-        card.addEventListener('click', () => { playSound('soft'); gsap.fromTo(card, { y: -8 }, { y: 0, duration: 0.25, ease: 'power1.out' }); });
-        futureGrid.appendChild(card);
-      });
-    }
-
-    function setUpRain() {
-      rainWords.innerHTML = '';
-      wordRain.forEach(word => {
-        const item = document.createElement('button');
-        item.className = 'rain-word';
-        item.textContent = word;
-        item.style.left = `${Math.random() * 84 + 7}%`;
-        item.style.top = `${Math.random() * 35 + 5}%`;
-        item.style.animation = `fall ${Math.random() * 12 + 12}s linear ${Math.random() * 4}s infinite`;
-        item.addEventListener('click', () => { playSound('sparkle'); item.style.color = '#ffb8da'; });
-        rainWords.appendChild(item);
-      });
-    }
-
-    leaveButton.addEventListener('mouseenter', () => { leaveButton.style.transform = `translate(${Math.random()*80+8}px, ${Math.random()*70+10}px)`; playSound('skip'); });
-    leaveButton.addEventListener('click', () => { leaveButton.textContent = 'GONE'; playSound('slide'); setTimeout(() => { leaveButton.textContent = 'LEAVE'; leaveButton.style.transform = 'translate(0,0)'; }, 700); });
-    continueButton.addEventListener('click', () => { playSound('glow'); gsap.fromTo(continueButton, { scale: 1 }, { scale: 1.08, yoyo: true, repeat: 1, duration: 0.25 }); enterChapter(11); });
-
-    document.querySelectorAll('.option-button').forEach(button => {
-      button.addEventListener('click', () => {
-        if (button.dataset.answer === 'true') { playConfetti(); quizResult.textContent = 'Correct! Messages from Samyrah bring the greatest joy.'; setTimeout(() => enterChapter(12), 1800); }
-        else { quizResult.textContent = 'So close. Think about the brightest part of every day.'; playSound('deny'); }
-      });
-    });
-
-    doorInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        if (doorInput.value.trim().toUpperCase() === 'SAMYRAH') { playSound('unlock'); setTimeout(() => enterChapter('finalChapter'), 900); }
-        else { playSound('deny'); doorInput.value = ''; doorInput.placeholder = 'Try again, beautiful.'; }
-      }
-    });
-
-    showFinal.addEventListener('click', () => { playSound('soft'); finalNarration.textContent = 'Before I met you... you were a stranger. Now... you are someone I care about deeply.'; createFinalLaunch(); });
-
-    function createFinalLaunch() {
-      for (let i = 0; i < 24; i += 1) {
-        const confetti = document.createElement('div');
-        confetti.className = 'particle';
-        confetti.style.width = `${Math.random() * 16 + 12}px`;
-        confetti.style.height = confetti.style.width;
-        confetti.style.left = `${Math.random() * 80 + 10}%`;
-        confetti.style.top = `${Math.random() * 20 + 10}%`;
-        confetti.style.background = ['#ff4fa3','#8a5cff','#ffffff','#ffb8da'][Math.floor(Math.random()*4)];
-        confetti.style.borderRadius = '20%';
-        document.body.appendChild(confetti);
-        gsap.to(confetti, { y: `+=${Math.random() * 180 + 120}`, x: `+=${Math.random() * 180 - 90}`, opacity: 0, scale: 0.1, duration: 1.8, ease: 'power3.out', onComplete: () => confetti.remove() });
-      }
-    }
-
-    function playSound(type) {
-      if (!state.musicOn) return;
-      const audioCtx = window.audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      window.audioCtx = audioCtx;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const now = audioCtx.currentTime;
-      osc.type = 'sine';
-      let frequency = 280;
-      let duration = 0.1;
-      switch (type) {
-        case 'tiny': frequency = 520; duration = 0.06; break;
-        case 'soft': frequency = 320; duration = 0.18; break;
-        case 'twinkle': frequency = 620; duration = 0.12; break;
-        case 'pulse': frequency = 260; duration = 0.16; break;
-        case 'sparkle': frequency = 720; duration = 0.14; break;
-        case 'skip': frequency = 180; duration = 0.08; break;
-        case 'slide': frequency = 260; duration = 0.2; break;
-        case 'glow': frequency = 480; duration = 0.14; break;
-        case 'unlock': frequency = 540; duration = 0.22; break;
-        case 'deny': frequency = 170; duration = 0.12; break;
-      }
-      osc.frequency.setValueAtTime(frequency, now);
-      gain.gain.setValueAtTime(0.001, now);
-      gain.gain.exponentialRampToValueAtTime(0.25, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-      osc.connect(gain).connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + duration + 0.02);
-    }
-
-    function toggleMusic() { state.musicOn = !state.musicOn; musicToggle.textContent = `Music: ${state.musicOn ? 'ON' : 'OFF'}`; if (state.musicOn) playSound('soft'); }
-    musicToggle.addEventListener('click', toggleMusic);
-
-    function createFloatingParticles() {
-      const layer = document.getElementById('particleLayer');
-      for (let i = 0; i < 80; i += 1) {
-        const dot = document.createElement('div');
-        dot.className = 'particle';
-        const size = Math.random() * 4 + 2;
-        dot.style.width = `${size}px`;
-        dot.style.height = `${size}px`;
-        dot.style.left = `${Math.random() * 100}%`;
-        dot.style.top = `${Math.random() * 100}%`;
-        dot.style.background = `rgba(255,255,255,${Math.random() * 0.3 + 0.1})`;
-        layer.appendChild(dot);
-        gsap.to(dot, { x: `${Math.random() * 120 - 60}px`, y: `${Math.random() * 120 - 60}px`, opacity: Math.random() * 0.5 + 0.2, duration: Math.random() * 18 + 12, repeat: -1, yoyo: true, ease: 'sine.inOut' });
-      }
-      for (let i = 0; i < 12; i += 1) {
-        const petal = document.createElement('div');
-        petal.className = 'petal';
-        const size = Math.random() * 14 + 14;
-        petal.style.width = `${size}px`;
-        petal.style.height = `${size * 0.6}px`;
-        petal.style.left = `${Math.random() * 100}%`;
-        petal.style.top = `${Math.random() * 100}%`;
-        petal.style.background = 'rgba(255,79,163,0.18)';
-        layer.appendChild(petal);
-        gsap.to(petal, { x: `${Math.random() * 120 - 60}px`, y: `${Math.random() * 120 - 60}px`, opacity: Math.random() * 0.4 + 0.2, duration: Math.random() * 20 + 16, repeat: -1, yoyo: true, ease: 'sine.inOut' });
-      }
-    }
-
-    function createCursorTrail() {
-      const cursor = document.getElementById('magicCursor');
-      document.addEventListener('mousemove', (event) => { cursor.style.left = `${event.clientX}px`; cursor.style.top = `${event.clientY}px`; });
-      document.addEventListener('mousedown', () => { cursor.style.transform = 'translate(-50%, -50%) scale(1.5)'; });
-      document.addEventListener('mouseup', () => { cursor.style.transform = 'translate(-50%, -50%) scale(1)'; });
-    }
-
-    function playConfetti() {
-      for (let i = 0; i < 28; i += 1) {
-        const confetti = document.createElement('div');
-        confetti.className = 'particle';
-        confetti.style.width = `${Math.random() * 10 + 8}px`;
-        confetti.style.height = `${Math.random() * 14 + 10}px`;
-        confetti.style.left = '50%';
-        confetti.style.top = '40%';
-        confetti.style.background = ['#ff4fa3','#8a5cff','#ffdfdf','#ffeea8'][Math.floor(Math.random()*4)];
-        confetti.style.borderRadius = '20%';
-        document.body.appendChild(confetti);
-        gsap.to(confetti, { x: `${Math.random() * 520 - 260}px`, y: `${Math.random() * 360 + 120}px`, rotation: Math.random() * 360, opacity: 0, duration: 2.2, ease: 'power3.out', onComplete: () => confetti.remove() });
-      }
-    }
-
-    function initScrollAnimations() {
-      gsap.registerPlugin(ScrollTrigger);
-      gsap.utils.toArray('.chapter-title, .glass-panel, .hint-card, .timeline-item, .museum-card, .future-card, .quiz-card, .door-portal, .final-panel').forEach(el => {
-        gsap.from(el, { opacity: 0, y: 40, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 85%' } });
-      });
-      gsap.from('#enterWorld', { scale: 0.92, opacity: 0, duration: 0.9, ease: 'back.out(1.7)', delay: 0.6 });
-    }
-
-    function init() {
-      animateLoader();
-      setUpTimeline();
-      setUpMuseum();
-      createHeartGame();
-      setUpStars();
-      setUpFuture();
-      setUpRain();
-      createFloatingParticles();
-      createCursorTrail();
-      initScrollAnimations();
-      AOS.init({ duration: 900, once: true, easing: 'ease-out-quart' });
-    }
-
-    init();
-  </script>
-  <style>
-    @keyframes fall { 0% { transform: translateY(-20px); opacity: 0; } 10% { opacity: 1; } 100% { transform: translateY(118vh); opacity: 0; } }
-  </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="script.js" defer></script>
 </body>
 </html>
